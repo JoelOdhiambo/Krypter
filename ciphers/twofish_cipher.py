@@ -58,18 +58,3 @@ class TwofishCipher:
             plain_text += twofish.decrypt(cipher_text[x * block_size: (x+1) * block_size])
             
         file_out.write(str.encode(plain_text.decode('utf-8').strip('%')))
-    
-if __name__ == '__main__':
-    twofish=TwofishCipher()
-    
-    password='12345'
-    
-    file_in='infile.txt'
-    file_out='infile.encrypted.txt'
-    twofish.encrypt_file(file_in, file_out, password) 
-    
-    file_in='infile.encrypted.txt'
-    file_out='infile.decrypted.txt'
-    twofish.decrypt_file(file_in, file_out, password)    
- 
-    

@@ -73,15 +73,3 @@ class AesCipher:
             os.remove(file_out_path)
             raise e
             
-
-if __name__ == '__main__':
-
-    password = '12345'
-
-    file_in='infile.txt'
-    file_out='infile.ecrypted.txt'
-    aes_cipher=AesCipher(file_in,password)
-    aes_cipher.encrypt_file(file_in,file_out,password)
-    file_in='infile.ecrypted.txt'
-    file_out='decrypted.txt'
-    aes_cipher.decrypt_file(file_in,file_out,password)
