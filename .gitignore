@@ -1,0 +1,4 @@
+# .gitignore for Krypter
+__pycache__
+
+infile.txt
