@@ -1,20 +1,16 @@
 import os
-import filecmp
 import shutil
 from functools import partial
 import tkinter as tk
-from tkinter import BOTTOM, DISABLED, GROOVE, SUNKEN, Entry, Label, Menu, PhotoImage, Radiobutton, StringVar, ttk
+from tkinter import  DISABLED, Label, Menu, PhotoImage,StringVar, ttk
 from tkinter import filedialog
 
 import random
 import string
-from colorama import Style
 
-from torch import var
 
-# import sys
-# import os
-# sys.path.append(os.path.join(os.path.dirname(__file__),'..','ciphers'))
+
+
 from ciphers.aes import AesCipher as aes_cipher
 from ciphers.twofish_cipher import TwofishCipher as two_fish
 
@@ -24,13 +20,6 @@ MAX_PASSWORD_LENGTH = 16
 class KrypterApp(tk.Tk):
     def __init__(self):
         super().__init__()
-        # try:
-        #     self.working_directory="Files"
-        #     self.parent_directory="C:/Krypter/"
-        #     self.app_path=os.path.join(self.parent_directory, self.working_directory)
-        #     os.mkdir(self.app_path)
-        # except:
-        #     print("Directory Exists")
 
         self.app_dir = 'C:/Krypter/Files'
         
@@ -41,11 +30,6 @@ class KrypterApp(tk.Tk):
         
         for directories in map(app_path,list):
             make_directory(directories)
-            
-        # if not os.path.exists(self.app_dir):
-        #     os.makedirs(self.app_dir)
-        # else:
-        #     print("Directory Exists")
 
         self.title('Krypter')
         self.tk.call('wm', 'iconphoto', self._w,
@@ -87,9 +71,6 @@ class KrypterApp(tk.Tk):
         self.label_one = Label(self, text="1. Choose file to encrypt")
         self.label_one.grid(column=0, row=0, sticky=tk.W, padx=5, pady=5)
 
-        # self.separator_two=ttk.Separator(self,orient='horizontal')
-        # self.separator_two.place(relx=0,rely=0.1,relheight=0.5,relwidth=1)
-
         self.path_name = StringVar(None)
 
         self.file_path_box = ttk.Entry(
@@ -104,11 +85,6 @@ class KrypterApp(tk.Tk):
             self, text="2. Enter a password and choose an Encryption Algorithm")
         self.label_two.grid(column=0, row=2, sticky=tk.W, padx=5, pady=5)
 
-        # self.separator_two=ttk.Separator(self,orient='horizontal')
-        # self.separator_two.place(relx=0,rely=0.3,relheight=0.5,relwidth=1)
-
-        # self.password_label=Label(self, text='Password')
-        # self.password_label.grid(column=0, row=3, sticky=tk.W,padx=17)
         self.default_password_var = tk.StringVar(None)
 
         self.password_entry = ttk.Entry(
