@@ -8,16 +8,11 @@ class TwofishCipher:
         self.in_filename=in_filename
         self.out_filename=self.in_filename+'.encrypted'
         
-        self.file_in=open(self.in_filename,'rb')
+        self.file_in=open(self.in_filename,'r')
         self.password=password
     
     def encrypt_file(self):
-        # try:
-        #     with open('infile.txt','r') as file_in:
-        #         plain_text=file_in.read()   
-        # except  FileNotFoundError:
-        #     print("File does not exist!")
-        
+       
         save_path='C:\Krypter\Files\encrypted files\Two fish'
         file_path=os.path.join(save_path,os.path.basename(self.out_filename))
         plain_text=self.file_in.read()
