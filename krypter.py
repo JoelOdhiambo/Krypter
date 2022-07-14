@@ -163,8 +163,8 @@ class KrypterApp(tk.Tk):
         self.separator_two=ttk.Separator(self,orient='horizontal')
         self.separator_two.place(relx=0,rely=0.95,relheight=0.5,relwidth=1)
 
-        self.progress_bar=ttk.Progressbar(self,orient='horizontal',mode='indeterminate',length=100)
-        self.progress_bar.place(x=1,y=453)
+        # self.progress_bar=ttk.Progressbar(self,orient='horizontal',mode='indeterminate',length=100)
+        # self.progress_bar.place(x=1,y=453)
         
     def open_file(self):
         
@@ -200,13 +200,14 @@ class KrypterApp(tk.Tk):
         self.default_password_var.set(self.default_password)
 
     def selected(self):
+       
         if self.radio_var.get() =='1':
             aes_cipher(self.file_name,'password').encrypt_file()
-            print("AES")
+            
         if self.radio_var.get()=='2':
             two_fish(self.file_name,'password').encrypt_file()
             print("Two Fish")
-        # print(self.radio_var.get())
+       
 if __name__ == '__main__':
 
     app = KrypterApp()
