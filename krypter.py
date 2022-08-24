@@ -8,20 +8,21 @@ from tkinter import filedialog
 import random
 import string
 
-from ciphers.aes import AesCipher as aes_cipher
+import ciphers.twofish_cipher
+from ciphers.aes_cipher import AesCipher as aes_cipher
 from ciphers.twofish_cipher import TwofishCipher as two_fish
 
 MAX_PASSWORD_LENGTH = 16
 
 
-class KrypterApp(tk.Tk):
+class KrypterApp(tk.Tk, ciphers.twofish_cipher.TwofishCipher, ciphers.aes_cipher.AesCipher):
     def __init__(self):
         super().__init__()
 
         self.app_dir = 'C:/Krypter/Files'
 
         list = ('original files', 'encrypted files/AES',
-                'encrypted files/Two fish')
+                'encrypted files/Twofish')
 
         app_path = partial(os.path.join, self.app_dir)
         make_directory = partial(os.makedirs, exist_ok=True)
@@ -139,7 +140,7 @@ class KrypterApp(tk.Tk):
                                                   value=1)
         self.aes_radio_button_e.grid(column=0, row=5, sticky=tk.W, padx=19)
         self.two_fish_radio_button_e = ttk.Radiobutton(self.encrypt_frame,
-                                                       text='Two Fish',
+                                                       text='Twofish',
                                                        variable=self.radio_var,
                                                        value=2)
         self.two_fish_radio_button_e.grid(column=0, row=6, sticky=tk.W, padx=19)
@@ -147,6 +148,8 @@ class KrypterApp(tk.Tk):
         self.label_three = Label(
             self.encrypt_frame, text="3. Encryption")
         self.label_three.grid(column=0, row=7, sticky=tk.W, padx=5, pady=10)
+
+        self.encrypted_file_dir_var = StringVar(None)
 
         self.label_four = Label(
             self.encrypt_frame, text="Working Directory: ")
@@ -190,7 +193,7 @@ class KrypterApp(tk.Tk):
         self.choose_button_two.grid(column=1, row=1, sticky=tk.W, pady=5)
 
         self.label_two = Label(
-            self.decrypt_frame, text="2. Enter your password and choose an the Encryption Algorithm")
+            self.decrypt_frame, text="2. Enter your password and choose a Decryption Algorithm")
         self.label_two.grid(column=0, row=2, sticky=tk.W, padx=5, pady=5)
 
         self.default_password_var = tk.StringVar(None)
@@ -211,7 +214,7 @@ class KrypterApp(tk.Tk):
                                                   value=3)
         self.aes_radio_button_d.grid(column=0, row=5, sticky=tk.W, padx=19)
         self.two_fish_radio_button_d = ttk.Radiobutton(self.decrypt_frame,
-                                                       text='Two Fish',
+                                                       text='Twofish',
                                                        variable=self.radio_var_two,
                                                        value=4)
         self.two_fish_radio_button_d.grid(column=0, row=6, sticky=tk.W, padx=19)
@@ -220,17 +223,19 @@ class KrypterApp(tk.Tk):
             self.decrypt_frame, text="3. Decryption")
         self.label_three.grid(column=0, row=7, sticky=tk.W, padx=5, pady=10)
 
+        self.encrypted_file_var = StringVar(None)
+
         self.label_five = Label(
             self.decrypt_frame, text="Working Directory: ")
         self.label_five.grid(column=0, row=8, sticky=tk.W, padx=17, pady=5)
 
-        self.encrypted_file_var = StringVar(None)
+        self.decrypted_file_dir_var = StringVar(None)
 
-        self.encrypted_file_path = ttk.Entry(
-            self.decrypt_frame, textvariable=self.encrypted_file_var, width=44)
+        self.decrypted_file_path = ttk.Entry(
+            self.decrypt_frame, width=44)
 
-        self.encrypted_file_path.config(state=DISABLED)
-        self.encrypted_file_path.place(x=130, y=238)
+        self.decrypted_file_path.config(state=DISABLED)
+        self.decrypted_file_path.place(x=150, y=238)
 
         self.encryption_photo = PhotoImage(
             file=r"icons\wicons8-password-50.png")
@@ -254,7 +259,7 @@ class KrypterApp(tk.Tk):
         self.file_name = 'C:\Krypter\Files\original files\\' + \
                          os.path.basename(self.original_file)
         self.original_file_var.set(self.file_name)
-        self.encrypted_file_dest.config(textvariable=self.original_file_var)
+        # self.encrypted_file_dest.config(textvariable=self.original_file_var)
         # if self.choose_button_one._name=="btn_one":
         #     self.original_file_var.set(self.file_name)
         # if self.choose_button_two._name=="btn_two":    
@@ -298,16 +303,25 @@ class KrypterApp(tk.Tk):
 
         # if self.encrypt_button["text"]=="Encrypt":
         if self.radio_var.get() == '1':
+            self.encrypted_file_dir_var.set(self.aes_encrypted_path)
             aes_cipher(self.original_file, 'password').encrypt_file()
+            self.encrypted_file_dest.config(textvariable=self.encrypted_file_dir_var)
+
         if self.radio_var.get() == '2':
+            self.encrypted_file_dir_var.set(self.tf_encrypted_path)
             two_fish(self.original_file, 'password').encrypt_file()
+            self.encrypted_file_dest.config(textvariable=self.encrypted_file_dir_var)
 
             # if self.decrypt_button["text"]=="Decrypt":
         # print(self.decrypt_button["text"])
         if self.radio_var_two.get() == '3':
+            self.decrypted_file_dir_var.set(self.aes_decrypted_path)
             aes_cipher(self.encrypted_file, 'password').decrypt_file()
+            self.decrypted_file_path.config(textvariable=self.decrypted_file_dir_var)
         if self.radio_var_two.get() == '4':
+            self.decrypted_file_dir_var.set(self.tf_decrypted_path)
             two_fish(self.encrypted_file, 'password').decrypt_file()
+            self.decrypted_file_path.config(textvariable=self.decrypted_file_dir_var)
 
     def change_to_encrypt(self):
         self.encrypt_frame.pack(fill="both", expand=True)
