@@ -3,18 +3,19 @@ from twofish import Twofish
 
 
 class TwofishCipher:
+    tf_encrypted_path: str = 'C:/Krypter/Files/encrypted files/Two fish'
+    tf_decrypted_path: str = 'C:/Krypter/Files/decrypted files/Two fish'
 
     def __init__(self, in_filename, password):
 
         self.in_filename = in_filename
         self.out_filename = self.in_filename + '.encrypted'
-
         self.password = password
 
     def encrypt_file(self):
-        save_path = 'C:/Krypter/Files/encrypted files/Two fish'
+
         encrypted_file_path = os.path.join(
-            save_path, os.path.basename(self.out_filename))
+            self.tf_encrypted_path, os.path.basename(self.out_filename))
 
         file_in = open(self.in_filename, 'r')
 
@@ -40,10 +41,9 @@ class TwofishCipher:
         file_out.write(cipher_text)
 
     def decrypt_file(self):
-        save_path = 'C:/Krypter/Files/decrypted files/Two fish'
 
         file_in = open(self.in_filename, 'rb')
-        decrypted_file_path = os.path.join(save_path, os.path.basename(
+        decrypted_file_path = os.path.join(self.tf_decrypted_path, os.path.basename(
             file_in.name).removesuffix('.encrypted'))
         cipher_text = file_in.read()
 

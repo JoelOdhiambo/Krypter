@@ -8,6 +8,9 @@ BUFFER_SIZE = 1024 * 1024
 
 
 class AesCipher:
+    aes_encrypted_path: str = 'C:/Krypter/Files/encrypted files/AES'
+    aes_decrypted_path: str = 'C:/Krypter/Files/decrypted files/AES'
+
     def __init__(self, in_filename, password):
 
         self.in_filename = in_filename
@@ -18,8 +21,7 @@ class AesCipher:
 
     def encrypt_file(self):
 
-        save_path = 'C:/Krypter/Files/encrypted files/AES'
-        encrypted_file_path = os.path.join(save_path, os.path.basename(self.out_filename))
+        encrypted_file_path = os.path.join(self.aes_encrypted_path, os.path.basename(self.out_filename))
         file_out = open(encrypted_file_path, 'wb')
 
         salt = get_random_bytes(32)
@@ -40,8 +42,7 @@ class AesCipher:
         file_out.close()
 
     def decrypt_file(self):
-        save_path = 'C:/Krypter/Files/decrypted files/AES'
-        decrypted_file_path = os.path.join(save_path, os.path.basename(self.file_in.name).removesuffix('.encrypted'))
+        decrypted_file_path = os.path.join(self.aes_decrypted_path, os.path.basename(self.file_in.name).removesuffix('.encrypted'))
 
         size_of_file_in = os.path.getsize(self.file_in.name)
         print(size_of_file_in)
