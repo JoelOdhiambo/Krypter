@@ -21,4 +21,4 @@
 > ![Alt text](screenshots/sub_directories_section.png?raw=true "Directory Structure")
 > *Files can be located in the directories that have been set above*
 > * Run `krypter.py` to launch the GUI
-> > #### *Please note that AES-256 encrypts both .pdf and .txt files successfully whereas Twofish only encrypts .txt files at the moment.* 
+> > #### *Please note that AES-256 encrypts .pdf, .txt, .png, .jpg, .jpeg, .mp3, .wav and .exe files successfully whereas Twofish only encrypts .txt files at the moment.* 
