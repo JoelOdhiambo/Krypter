@@ -3,8 +3,8 @@ from twofish import Twofish
 
 
 class TwofishCipher:
-    tf_encrypted_path: str = 'C:/Krypter/Files/encrypted files/Two fish'
-    tf_decrypted_path: str = 'C:/Krypter/Files/decrypted files/Two fish'
+    tf_encrypted_path: str = 'C:/Krypter/Files/encrypted files/Twofish'
+    tf_decrypted_path: str = 'C:/Krypter/Files/decrypted files/Twofish'
 
     def __init__(self, in_filename, password):
 
