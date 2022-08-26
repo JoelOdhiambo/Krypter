@@ -4,3 +4,4 @@ __pycache__
 infile.txt
 .idea
 twofish-optimized-c
+test.py
