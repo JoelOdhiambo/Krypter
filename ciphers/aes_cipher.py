@@ -4,6 +4,7 @@ from Cryptodome.Cipher import AES
 from Cryptodome.Protocol.KDF import scrypt
 from Cryptodome.Random import get_random_bytes
 
+
 BUFFER_SIZE = 1024 * 1024
 
 
@@ -42,7 +43,9 @@ class AesCipher:
         file_out.close()
 
     def decrypt_file(self):
-        decrypted_file_path = os.path.join(self.aes_decrypted_path, os.path.basename(self.file_in.name).removesuffix('.encrypted'))
+        decryption_status = False
+        decrypted_file_path = os.path.join(self.aes_decrypted_path,
+                                           os.path.basename(self.file_in.name).removesuffix('.encrypted'))
 
         size_of_file_in = os.path.getsize(self.file_in.name)
         print(size_of_file_in)
@@ -68,8 +71,10 @@ class AesCipher:
         tag = self.file_in.read(16)
         try:
             cipher.verify(tag)
-        except ValueError as e:
+            decryption_status = True
+        except ValueError:
             self.file_in.close()
             file_out.close()
             os.remove(decrypted_file_path)
-            raise e
+        return decryption_status
+
