@@ -1,5 +1,6 @@
 import os
 from twofish import Twofish
+from exceptions import FileNotDecryptedException
 
 
 class TwofishCipher:
@@ -41,7 +42,7 @@ class TwofishCipher:
         file_out.write(cipher_text)
 
     def decrypt_file(self):
-
+        decryption_status = False
         file_in = open(self.in_filename, 'rb')
         decrypted_file_path = os.path.join(self.tf_decrypted_path, os.path.basename(
             file_in.name).removesuffix('.encrypted'))
@@ -53,9 +54,16 @@ class TwofishCipher:
 
         twofish = Twofish(str.encode(self.password))
         plain_text = b''
+        try:
+            for x in range(int(len(cipher_text) / block_size)):
+                plain_text += twofish.decrypt(
+                    cipher_text[x * block_size: (x + 1) * block_size])
 
-        for x in range(int(len(cipher_text) / block_size)):
-            plain_text += twofish.decrypt(
-                cipher_text[x * block_size: (x + 1) * block_size])
+            file_out.write(str.encode(plain_text.decode('utf-8').strip('%')))
+            decryption_status = True
+        except ValueError:
+            file_in.close()
+            file_out.close()
+            os.remove(decrypted_file_path)
+        return decryption_status
 
-        file_out.write(str.encode(plain_text.decode('utf-8').strip('%')))

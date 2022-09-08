@@ -1,15 +1,16 @@
 import os
+import pathlib
 import shutil
 import random
 import string
 import time
 import tkinter as tk
 import threading
-import ciphers.twofish_cipher
 
 from functools import partial
 from tkinter import Frame, Label, PhotoImage, StringVar, ttk
 from tkinter import filedialog
+from tkinter.messagebox import showinfo, showerror
 
 from ciphers.aes_cipher import AesCipher as aes_cipher
 from ciphers.twofish_cipher import TwofishCipher as two_fish
@@ -17,16 +18,19 @@ from ciphers.twofish_cipher import TwofishCipher as two_fish
 MAX_PASSWORD_LENGTH = 16
 
 
-class KrypterApp(tk.Tk, ciphers.twofish_cipher.TwofishCipher, ciphers.aes_cipher.AesCipher):
+class KrypterApp(tk.Tk):
     def __init__(self):
         super().__init__()
 
         # Krypter directory structure
+        self.status_flag = None
+        self.original_file = None
         self.app_dir = 'C:/Krypter/Files'
 
         sub_directory_tree = ('original files', 'encrypted files/AES',
                               'encrypted files/Twofish', 'decrypted files/AES', 'decrypted files/Twofish')
 
+        self.file_types = (("All files", "*.*"), ("Text files", "*.txt*"))
         app_path = partial(os.path.join, self.app_dir)
         make_directory = partial(os.makedirs, exist_ok=True)
 
@@ -36,7 +40,7 @@ class KrypterApp(tk.Tk, ciphers.twofish_cipher.TwofishCipher, ciphers.aes_cipher
         self.title('Krypter')
         # GUI icon
         self.tk.call('wm', 'iconphoto', self._w,
-                     tk.PhotoImage(file='icons\Krypter Icon.png'))
+                     tk.PhotoImage(file='icons/Krypter Icon.png'))
         self.geometry('500x500')
         self.resizable(False, False)
 
@@ -197,7 +201,8 @@ class KrypterApp(tk.Tk, ciphers.twofish_cipher.TwofishCipher, ciphers.aes_cipher
         self.encrypt_button.grid(column=0, row=9, sticky=tk.W, padx=19, pady=5)
 
         self.view_encrypted_file_button = ttk.Button(self.encrypt_frame,
-                                           text="View file", command=self.open_encrypted_file, state='disabled')
+                                                     text="View file", command=self.open_encrypted_file,
+                                                     state='disabled')
         self.view_encrypted_file_button.grid(
             column=0, row=9, sticky=tk.W, padx=115, pady=5)
 
@@ -214,7 +219,7 @@ class KrypterApp(tk.Tk, ciphers.twofish_cipher.TwofishCipher, ciphers.aes_cipher
         self.encrypted_file_path = StringVar(None)
 
         self.encrypted_file_entry = ttk.Entry(
-            self.decrypt_frame, width=44, state = 'disabled')
+            self.decrypt_frame, width=44, state='disabled')
         self.encrypted_file_entry.grid(
             column=0, row=1, sticky=tk.W, padx=20, pady=5)
 
@@ -300,47 +305,43 @@ class KrypterApp(tk.Tk, ciphers.twofish_cipher.TwofishCipher, ciphers.aes_cipher
         # self.progress_bar_text.place(x=329, y=475)
 
     def open_original_file(self):
-        # print(list(self.encrypt_button.state())[0])
-        # if list(self.encrypt_button.state())[0] != "enabled":
-        #     self.encrypt_button.config(state='disabled')
 
-        self.file_types = (("All files", "*.*"), ("Text files", "*.txt*"))
         self.original_file = filedialog.askopenfilename(initialdir="/",
                                                         title="Choose a File",
-                                                        filetypes=(("All files", "*.*"), ("Text files", "*.txt*")))
+                                                        filetypes=self.file_types)
 
         self.original_file_path.set(self.original_file)
         self.original_file_entry.config(textvariable=self.original_file_path)
-        print(self.original_file_entry.get())
-        print("Hi" + self.original_file)
-        shutil.copy(self.original_file, 'C:\Krypter\Files\original files')
-        self.file_name = 'C:\Krypter\Files\original files\\' + \
-                         os.path.basename(self.original_file)
-        self.original_file_var.set(self.file_name)
 
-        self.aes_radio_button_e.config(state="active")
-        self.two_fish_radio_button_e.config(state="active")
-        if 'disabled' not in self.view_encrypted_file_button.state():
-            self.view_encrypted_file_button.config(state='disabled')
+        if self.original_file:
+            self.file_name = 'C:\Krypter\Files\original files\\' + \
+                             os.path.basename(self.original_file)
+            self.original_file_var.set(self.file_name)
+
+            self.aes_radio_button_e.config(state="active")
+            self.two_fish_radio_button_e.config(state="active")
+            if 'disabled' not in self.view_encrypted_file_button.state():
+                self.view_encrypted_file_button.config(state='disabled')
 
     def open_encrypted_file(self):
         self.file_types = (("All files", "*.*"), ("Text files", "*.txt*"))
         self.encrypted_file = filedialog.askopenfilename(initialdir="C:/Krypter/Files/encrypted files",
                                                          title="Choose a File",
-                                                         filetypes=(("All files", "*.*"), ("Text files", "*.txt*")))
+                                                         filetypes=self.file_types)
         self.encrypted_file_var.set(self.encrypted_file)
         self.encrypted_file_entry.config(textvariable=self.encrypted_file_var)
 
-        self.aes_radio_button_d.config(state="active")
-        self.two_fish_radio_button_d.config(state="active")
-        if 'disabled' not in self.view_decrypted_file_button.state():
-            self.view_decrypted_file_button.config(state='disabled')
+        if self.encrypted_file:
+            self.aes_radio_button_d.config(state="active")
+            self.two_fish_radio_button_d.config(state="active")
+            if 'disabled' not in self.view_decrypted_file_button.state():
+                self.view_decrypted_file_button.config(state='disabled')
 
     def open_decrypted_file(self):
-        self.file_types = (("All files", "*.*"), ("Text files", "*.txt*"))
+
         self.encrypted_file = filedialog.askopenfilename(initialdir=self.decrypted_file_dir_var.get(),
                                                          title="Choose a File",
-                                                         filetypes=(("All files", "*.*"), ("Text files", "*.txt*")))
+                                                         filetypes=self.file_types)
         self.encrypted_file_var.set(self.encrypted_file)
         self.encrypted_file_entry.config(textvariable=self.encrypted_file_var)
 
@@ -360,84 +361,126 @@ class KrypterApp(tk.Tk, ciphers.twofish_cipher.TwofishCipher, ciphers.aes_cipher
             self.check_button_two.config(text="Hide Password")
 
     def generate_password(self):
-        self.lowercase_characters = string.ascii_lowercase
-        self.uppercase_characters = string.ascii_uppercase
-        self.digits = string.digits
-        self.symbols = string.punctuation
+        lowercase_characters = string.ascii_lowercase
+        uppercase_characters = string.ascii_uppercase
+        digits = string.digits
+        symbols = string.punctuation
 
-        self.all_characters = self.lowercase_characters + \
-            self.uppercase_characters + self.digits + self.symbols
+        all_characters = lowercase_characters + \
+                         uppercase_characters + digits + symbols
 
-        self.password_combo = random.sample(
-            self.all_characters, MAX_PASSWORD_LENGTH)
+        __password_combo = random.sample(
+            all_characters, MAX_PASSWORD_LENGTH)
 
-        self.default_password = "".join(self.password_combo)
-        self.default_password_var.set(self.default_password)
+        __default_password = "".join(__password_combo)
+        self.default_password_var.set(__default_password)
 
     def radio_button_state(self):
         if 'active' in self.aes_radio_button_e.state() or self.two_fish_radio_button_e.state():
-            self.encrypt_button.config(state='enabled')
+            if len(self.password_entry_one.get()) != 0:
+                self.encrypt_button.config(state='enabled')
+            elif len(self.password_entry_one.get()) == 0:
+                print(len(self.password_entry_one.get()))
+                print(type(self.password_entry_one.get()))
+                showinfo(title='Krypter Info',
+                         message='Please input a password and select a desired algorithm.')
 
         if 'active' in self.aes_radio_button_d.state() or self.two_fish_radio_button_d.state():
-            self.decrypt_button.config(state='enabled')
+            if len(self.password_entry_two.get()) != 0:
+                self.decrypt_button.config(state='enabled')
+            elif len(self.password_entry_two.get()) ==0:
+                showinfo(title='Krypter Info',
+                         message='Please input a password and select a desired algorithm.')
 
     def run_thread(self):
         execute_thread = threading.Thread(target=self.active_radio_button)
         execute_thread.start()
 
-    def active_radio_button(self):
-
+    def progress_bar_start(self):
         self.progress_bar.start(10)
 
-        if self.radio_var.get() and self.radio_var_two.get() == 0:
-            print("Choose and algorithm")
+    def progress_bar_stop(self):
+        self.progress_bar.stop()
+
+    def active_radio_button(self):
+
+        self.progress_bar_start()
 
         if 'active' in self.encrypt_button.state():
+            shutil.copy(self.original_file_path.get(), 'C:/Krypter/Files/original files')
             if self.radio_var.get() == '1':
                 self.status_bar.config(text="  AES encryption in progress...")
-                self.encrypted_file_dir_var.set(self.aes_encrypted_path)
+                self.encrypted_file_dir_var.set(aes_cipher.aes_encrypted_path)
                 aes_cipher(self.original_file,
                            self.password_entry_one.get()).encrypt_file()
                 self.encrypted_file_dest.config(
                     textvariable=self.encrypted_file_dir_var)
 
             if self.radio_var.get() == '2':
-                self.status_bar.config(text="  Twofish encryption in progress...")
-                self.encrypted_file_dir_var.set(self.tf_encrypted_path)
-                two_fish(self.original_file,
-                         self.password_entry_one.get()).encrypt_file()
-                self.encrypted_file_dest.config(
-                    textvariable=self.encrypted_file_dir_var)
+                if pathlib.Path(self.original_file).suffix == '.txt':
+                    self.status_bar.config(text="  Twofish encryption in progress...")
+                    self.encrypted_file_dir_var.set(two_fish.tf_encrypted_path)
+                    two_fish(self.original_file,
+                             self.password_entry_one.get()).encrypt_file()
+                    self.encrypted_file_dest.config(
+                        textvariable=self.encrypted_file_dir_var)
+                else:
+                    showinfo(title='Krypter Info',
+                             message='Twofish can only encrypt .txt files at the moment.')
+                    print("CAN NOT")
+            time.sleep(1)
+            self.status_bar.config(text=" File Encrypted!")
             self.view_encrypted_file_button.config(state='normal')
             self.encrypt_button.config(state='disabled')
 
         if 'active' in self.decrypt_button.state():
             if self.radio_var_two.get() == '3':
                 self.status_bar.config(text="  AES decryption in progress...")
-                self.decrypted_file_dir_var.set(self.aes_decrypted_path)
-                aes_cipher(self.encrypted_file,
-                           self.password_entry_two.get()).decrypt_file()
+                self.decrypted_file_dir_var.set(aes_cipher.aes_decrypted_path)
+
+                if (aes_cipher(self.encrypted_file,
+                               self.password_entry_two.get()).decrypt_file()):
+                    self.status_bar.config(text=" File Decrypted!")
+                    self.view_decrypted_file_button.config(state='normal')
+                else:
+                    showerror(title='Krypter Warning',
+                              message='Failed to decrypt file. This could be probably because the password is '
+                                      'incorrect or '
+                                      'the file has been damaged.')
+                    self.progress_bar_stop()
+                    self.status_bar.config(text=" Waiting...")
+                # print(de)
                 self.decrypted_file_path.config(
                     textvariable=self.decrypted_file_dir_var)
 
             if self.radio_var_two.get() == '4':
                 self.status_bar.config(text="  Twofish decryption in progress...")
-                self.decrypted_file_dir_var.set(self.tf_decrypted_path)
-                two_fish(self.encrypted_file,
-                         self.password_entry_two.get()).decrypt_file()
-                self.decrypted_file_path.config(
-                    textvariable=self.decrypted_file_dir_var)
-            self.view_decrypted_file_button.config(state='normal')
+                self.decrypted_file_dir_var.set(two_fish.tf_decrypted_path)
+                if (two_fish(self.encrypted_file,
+                             self.password_entry_two.get()).decrypt_file()):
+                    self.decrypted_file_path.config(
+                        textvariable=self.decrypted_file_dir_var)
+                    self.status_bar.config(text=" File Decrypted!")
+                    self.view_decrypted_file_button.config(state='normal')
+                else:
+                    showerror(title='Krypter Warning',
+                              message='Failed to decrypt file. This could be probably because the password is '
+                                      'incorrect or '
+                                      'the file has been damaged.')
+                    self.progress_bar_stop()
+                    self.status_bar.config(text=" Waiting...")
+
+            time.sleep(1)
+
             self.decrypt_button.config(state='disabled')
 
         time.sleep(1)
-        self.status_bar.config(text=" File Encrypted!")
-        time.sleep(1)
+        self.progress_bar_stop()
         self.status_bar.config(text=" Waiting...")
-        self.progress_bar.stop()
 
     def is_clicked(self):
         print(self.decrypt_button.state())
+
     def change_to_encrypt(self):
         self.encrypt_frame.pack(fill="both", expand=True)
         self.decrypt_frame.forget()
@@ -445,7 +488,6 @@ class KrypterApp(tk.Tk, ciphers.twofish_cipher.TwofishCipher, ciphers.aes_cipher
     def change_to_decrypt(self):
         self.decrypt_frame.pack(fill="both", expand=True)
         self.encrypt_frame.forget()
-        self.frame_var = self.frames[1]
 
 
 if __name__ == '__main__':
