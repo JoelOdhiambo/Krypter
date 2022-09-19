@@ -377,20 +377,22 @@ class KrypterApp(tk.Tk):
 
     def radio_button_state(self):
         if 'active' in self.aes_radio_button_e.state() or self.two_fish_radio_button_e.state():
+            print(len(self.password_entry_one.get()))
             if len(self.password_entry_one.get()) != 0:
                 self.encrypt_button.config(state='enabled')
-            elif len(self.password_entry_one.get()) == 0:
-                print(len(self.password_entry_one.get()))
-                print(type(self.password_entry_one.get()))
-                showinfo(title='Krypter Info',
-                         message='Please input a password and select a desired algorithm.')
+
+            # elif len(self.password_entry_one.get()) == 0:
+            #     print(len(self.password_entry_one.get()))
+            #     print(type(self.password_entry_one.get()))
+            #     # showinfo(title='Krypter Info',
+            #     #          message='Please input a password and select a desired algorithm.')
 
         if 'active' in self.aes_radio_button_d.state() or self.two_fish_radio_button_d.state():
             if len(self.password_entry_two.get()) != 0:
                 self.decrypt_button.config(state='enabled')
-            elif len(self.password_entry_two.get()) ==0:
-                showinfo(title='Krypter Info',
-                         message='Please input a password and select a desired algorithm.')
+            # elif len(self.password_entry_two.get()) == 0:
+            #     showinfo(title='Krypter Info',
+            #              message='Please input a password and select a desired algorithm.')
 
     def run_thread(self):
         execute_thread = threading.Thread(target=self.active_radio_button)
